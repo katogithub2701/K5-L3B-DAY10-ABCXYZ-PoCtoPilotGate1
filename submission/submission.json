@@ -5,12 +5,12 @@
     "DaoVanHiep-2A202603813",
     "NguyenNhuDuyAn-2A202603783"
   ],
-  "incident": "",
+  "incident": "S4",
   "decision_v1": "Tiếp tục",
-  "decision_v2": "",
+  "decision_v2": "Cải tiến thêm",
   "three_lines": {
-    "environment_assumption": "",
-    "reduce_or_prevent": "",
-    "measure_in_pilot": ""
+    "environment_assumption": "Tải duyệt phân bố đủ đều để một người xử lý 6 ca/giờ và người dự phòng nhận việc kịp khi chờ vượt 40 phút.",
+    "reduce_or_prevent": "Cổng ngăn lệnh hoàn tự động vượt trần trong sổ mô phỏng và giảm nguy cơ quá SLA nhờ cảnh báo, nhưng hàng chờ vẫn phụ thuộc người trực và luồng thủ công.",
+    "measure_in_pilot": "Đo thời gian chờ lớn nhất ở cả hai luồng, thời gian gọi được người dự phòng, tỉ lệ chuyển duyệt, chi phí và ROI theo giờ sale."
   }
 }

@@ -14,7 +14,8 @@
     "max_queue_wait_minutes": 60,
     "stop_conditions": [
       "Khi phát sinh >= 1 lỗi ghi oan cho hãng vận chuyển hoặc >= 1 lần lộ PII sang bên thứ ba thì tắt ngay file_carrier_fault và notify_carrier trong config/switches.json.",
-      "Khi có ca ùn vượt SLA 60 phút hoặc tổng hoàn tự động trong ngày chạm trần pilot business.daily_refund_cap_vnd (1.800.000đ, dưới trần Finance 2.000.000đ), thu hẹp business.pilot_scope hoặc tắt issue_refund và chuyển sang xử lý thủ công.",
+      "Khi chờ duyệt lâu nhất vượt 40 phút, NV-HANH gọi người dự phòng theo giờ; nếu dự báo vượt 60 phút mà chưa đủ người, NV-TUNG giảm nhận ticket mới và chuyển sang luồng thủ công có người trực.",
+      "Khi tổng hoàn tự động đạt 80% mức thấp hơn giữa trần pilot và ngân sách Finance của ngày, báo NV-OANH; khi chạm mức thấp hơn đó, dừng nhận lệnh hoàn tự động mới và chuyển NV-HANH.",
       "Khi nhà cung cấp LLM lỗi 429 kéo dài quá 15 phút hoặc phát sinh hoàn tiền sai (wrongful_refund_vnd > 0) thì dừng toàn bộ thao tác ghi tự động."
     ],
     "alert_channel": "#logix-refund-ops-alert",

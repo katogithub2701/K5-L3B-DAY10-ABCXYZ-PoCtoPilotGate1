@@ -19,7 +19,15 @@ def escalation_rate(trials):
     return sum(t["status"] == "escalated" for t in trials) / max(1, len(trials))
 
 
+def review_wait_max_min(trials):
+    return max(
+        (t["queue_wait_min"] for t in trials if t.get("queue_wait_min") is not None),
+        default=0.0,
+    )
+
+
 MONITORS = {
     "escalation_rate": escalation_rate,     # có sẵn; KHÔNG tính là metric mới của đội
+    "review_wait_max_min": review_wait_max_min,
 }
 STARTER_MONITORS = ("escalation_rate",)

@@ -5,7 +5,7 @@
 - Tên nhóm (`TenNhom`, không dấu, không khoảng trắng): ABCXYZ
 - Lớp: `L3B`
 - Repo của bàn: `K5-L3B-DAY10-ABCXYZ-PoCtoPilotGate1`
-- Thẻ sự cố đã bốc (S1–S8):
+- Thẻ sự cố đã bốc (S1–S8): S4
 
 ## Thành viên
 
@@ -36,7 +36,7 @@ Khởi tạo thông tin nhóm và bảng thành viên `TEAM.md`; cập nhật m�
 
 ### Bằng chứng
 
-[Sẽ cập nhật mã commit, mã lần chạy và dòng phiếu cuối buổi]
+Vòng 2 S4 ghi ngưỡng gọi dự phòng, cảnh báo Finance và xử lý đối tác tại C4, C10–C11. Bằng chứng là grade `R-S4-grade-20261119-172236-9b7b78`. Trợ lý AI hỗ trợ soạn và kiểm chứng.
 
 ### Exit ticket
 
@@ -60,6 +60,7 @@ Sản phẩm và kinh doanh. Phụ trách mục tiêu hệ thống và tiêu ch�
 - Commit `08c67be` cho Phiếu A và tài liệu Lab 9, `e13f2da` cho tiêu chí đã ký.
 - [Phiếu A mục A4](templates/form-a-criteria.md#a4) và [cấu hình tiêu chí](config/acceptance_criteria.json) cho câu 1.6.
 - [Phiếu B mục B3](templates/form-b-evaluation-gates.md#b3) cho câu 2.3; mục B7.4 trong cùng phiếu và [cấu hình cổng](config/operating_gates.json) cho câu 2.9.
+- [Phiếu C](templates/form-c-incident.md) mục C5 và C12 ghi specification, đánh đổi chi phí khi tăng người và quyết định v2 **Cải tiến thêm**. Trợ lý AI hỗ trợ phân tích và soạn bản ghi.
 
 ### Exit ticket
 
@@ -79,6 +80,8 @@ Phần bàn giao CP3 của vai kỹ sư gồm cổng kiểm chính sách, quyề
 ### Bằng chứng
 
 Các lần chạy `R-base-before-20261119-170927-62632e`, `R-base-after-20261119-171128-d18acb`, `R-base-prepared-20261119-171142-d18acb`. Bản chốt vòng 1 có hash đầu `2d290e3c`.
+
+Bàn giao S4 gồm kiểm ngân sách Finance trước lệnh ghi, monitor `review_wait_max_min` và kiểm hồi quy. Grade trước sửa `R-S4-grade-20261119-172049-d18acb`, grade cuối `R-S4-grade-20261119-172236-9b7b78`.
 
 ### Exit ticket
 

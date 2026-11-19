@@ -367,6 +367,8 @@ Lượng ticket có thể dồn gấp ba trong một giờ (ngày sale, sau bão
 
 ---
 
+**Bổ sung B7.6 sau khi nhận S4.** Ca chính giữ một người, 6 ca/giờ. Hạnh gọi một người dự phòng theo giờ khi có ít nhất 6 ca cần duyệt trong giờ hoặc chờ lâu nhất vượt 40 phút. Tùng điều tiết đầu vào nếu dự báo vượt 60 phút và chưa có người nhận. Oanh nhận cảnh báo ở 240.000đ và dừng nhận hoàn tự động mới khi chạm 300.000đ trong ngày sale. Thử hai người cả ca giảm thời gian chờ từ 46 xuống 6 phút, nhưng chi phí tăng từ 7.483đ lên 8.787đ/ticket và ROI giảm từ 34% xuống 14%. Xem Phiếu C mục C7 và C11.
+
 <a id="b8"></a>
 
 ## B8 · Chốt cổng vòng 1 và quyết định Gate 1 · v1 (phút 105–115)

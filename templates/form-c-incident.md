@@ -1,447 +1,176 @@
 # Phiếu C · Sự cố và quyết định v2 · Khối 3 (phút 125–200)
 
-**Bàn:** ______ · **Thẻ đã bốc:** ___ *(để trống tới phút 125; bốc số xong thì ghi đúng số đó, ví dụ `S3`. Lab Coach đối chiếu với sổ; lệnh tự kiểm tra in dòng này trong report.)*
-
-Mở `incidents/Sx/card.md` của đúng số đã bốc. Các bước trên thẻ trỏ về đúng mục trong phiếu này. Mục C3 chỉ điền phần ứng với
-số thẻ của bàn; các phần khác để trống.
-
-**Mục lục**
-- [C0 · Nhật ký lần chạy vòng 2 (suốt khối)](#c0)
-- [C1 · Câu 3.0 · Mốc prepared và đối chiếu pre-mortem · phút 125–135 · bước 0 trên thẻ](#c1)
-- [C2 · Câu 3.1 · Bảng soát lỗi của thẻ · phút 135–145 · bước 1–2](#c2)
-- [C3 · Câu 3.1 · Phần riêng theo thẻ · phút 135–145 · bước 3](#c3)
-- [C4 · Câu 3.1 · HAZOP của thẻ (≥ 3 dòng) · phút 145–150 · bước 4](#c4)
-- [C5 · Câu 3.2, 3.3 · Specification và giả định môi trường · phút 145–150 · bước 4](#c5)
-- [C6 · Câu 3.4 · Fault tree TRƯỚC khi sửa · phút 150–155 · bước 4](#c6)
-- [C7 · Câu 3.5 · Bảng sửa: nguyên nhân → chỗ sửa → giảm hay ngăn · phút 155–180 · bước 5–7](#c7)
-- [C8 · Câu 3.6 · Chỉ số theo dõi mới · phút 155–180 · bước 5](#c8)
-- [C9 · Câu 3.7 · Fault tree SAU khi sửa · phút 180–185 · bước 8](#c9)
-- [C10 · Câu 3.7 · Risk register (≥ 1 dòng) · phút 180–185 · bước 8](#c10)
-- [C11 · Câu 3.7 · Cập nhật checklist 9 nhóm việc và Runbook phần 4–5 · phút 180–185 (runbook có thể xong trong 185–200) · bước 8](#c11)
-- [C12 · Quyết định Gate 1 · v2 và ba dòng bắt buộc · phút 185–200 · bước 9](#c12)
-
----
+**Bàn:** K5-L3B-DAY10-ABCXYZ-PoCtoPilotGate1 · **Thẻ đã bốc:** S4
 
 <a id="c0"></a>
 
 ## C0 · Nhật ký lần chạy vòng 2
 
-Mỗi lệnh `lab10.eval` và `lab10.grade` tự ghi một dòng vào `runs/journal.jsonl`. Điền cột "Đổi MỘT thứ gì" (tham số `--note`) và "Kết luận".
-
-| # | Mã lần chạy | Bộ ticket · mốc | Đổi MỘT thứ gì so với lần trước | pass_rate (khoảng tin cậy 95%) | pass_k | Hoàn sai (đ) · lỗi hãng oan · lộ dữ liệu | Tỉ lệ chuyển người | Kết luận (một câu) |
-|---|---|---|---|---|---|---|---|---|
-| 1 | | Sx · prepared | nhận thẻ đã bốc, chưa sửa thêm (đúng cổng vòng 1 đã chốt) | | | | | |
-| 2 | | Sx · after | | | | | | |
-| 3 | | Sx · after | | | | | | |
-| 4 | | base · after | (kiểm không regression) | | | | | |
-
----
+| Mã lần chạy | Bộ · mốc | Thay đổi | pass_rate [CI 95%] · pass_k | Hoàn sai · lỗi hãng oan · PII | Tỉ lệ chuyển duyệt | Kết luận |
+|---|---|---|---|---|---|---|
+| R-S4-before-20261119-172050-d18acb | S4 · base | Mốc đối chiếu chưa có cổng | 0,8683 [0,8000; 0,9268] · 0,6829 | 160.000đ · 27 · 0 | 36,59% | Quá hạn duyệt, vượt ngân sách và phát sinh lỗi an toàn. |
+| R-S4-prepared-20261119-172051-d18acb | S4 · prepared | Dùng snapshot vòng 1 trước khi sửa | 1,00 [1,00; 1,00] · 1,00 | 0đ · 0 · 0 | 54,78% | Không còn ca ùn, chờ tối đa 46 phút. |
+| R-S4-after-20261119-172152-5b40d3 | S4 · after | Áp trần Finance theo ngày và đo chờ duyệt | 1,00 [1,00; 1,00] · 1,00 | 0đ · 0 · 0 | 54,78% | Monitor ghi được 46 phút, mức hoàn ngày cao nhất 248.000đ. |
+| R-S4-after-20261119-172235-9b7b78 | S4 · after | Bổ sung quy trình điều tiết và cảnh báo Finance | 1,00 [1,00; 1,00] · 1,00 | 0đ · 0 · 0 | 54,78% | Giữ kết quả kỹ thuật, xác định người hành động khi vượt ngưỡng cảnh báo. |
+| R-base-after-20261119-172235-9b7b78 | base · after | Đổi bộ ticket để kiểm hồi quy | 1,00 [1,00; 1,00] · 1,00 | 0đ · 0 · 0 | 24,62% | 65/65 lượt trong pilot, 0 ca ùn. |
 
 <a id="c1"></a>
 
 ## C1 · Câu 3.0 · Mốc prepared và đối chiếu pre-mortem
 
-Chạy **trước khi sửa bất cứ thứ gì**:
-
-```bash
-python3 -m lab10.grade --incident Sx
-```
-
-- Mã lần chạy grade: `__________` · base: `__________` · prepared: `__________`
-- Cổng vòng 1 đỡ được ô / con số nào (so cột base với cột prepared): …
-- Khối kinh doanh và vận hành còn dòng nào vượt trần: …
-
-**Mở lại pre-mortem (Phiếu B mục B6), viết bằng bút khác màu.** Với thẻ S1, S3, S4, S5 đây là một phần của phần riêng theo thẻ.
-
-- Sự cố trên thẻ thuộc lăng kính nào (kỹ thuật, kinh doanh, con người và vận hành, pháp lý)? …
-- Có nằm trong các lý do bàn đã viết không? Nếu có: cổng vòng 1 đã đỡ được bao nhiêu (đọc cột prepared trong report)? Nếu không: vì sao cả bàn không nghĩ tới? …
-- Lý do còn thiếu, thêm bây giờ:
-
-| Lý do thất bại (viết ở thì quá khứ) | Lăng kính | Kiểm được bằng gì (trace / data / config nào) |
-|---|---|---|
-| | | |
-
----
+- Grade trước sửa: `R-S4-grade-20261119-172049-d18acb`. Base và prepared là hai dòng đầu C0. Integrity đạt. Monitor mới chưa có.
+- So với base, prepared đưa chờ tối đa từ 78 xuống 46 phút, ca ùn từ 4 xuống 0 và hoàn tự động ngày cao nhất từ 466.000đ xuống 248.000đ, dưới trần ngày sale 300.000đ. Hoàn sai cộng qua 5 seed giảm từ 160.000đ xuống 0đ, lỗi hãng oan từ 27 xuống 0. Chi phí tăng từ 4.980đ lên 7.483đ/ticket và ROI giảm từ 85% xuống 34%.
+- Prepared không vượt trần vận hành in trong report. Tỉ lệ chuyển duyệt 54,78% vẫn vượt ngưỡng mong muốn 35%, đồng thời chờ tối đa đã vượt mức cảnh báo 40 phút của runbook. Tỉ lệ công việc vào hàng chờ gồm cả kiểm mẫu là 55,65%.
+- B6 đã dự báo nghẽn LLM dẫn đến fail-open (kỹ thuật), hoàn vượt trần (kinh doanh), quá công suất duyệt (con người và vận hành) và ghi oan hãng (pháp lý). Prepared đỡ được tác hại đo trong gói này nhờ giới hạn phạm vi và chặn fail-open, nhưng phải chuyển duyệt nhiều hơn.
+- **Bổ sung sau S4:** Trần Finance giảm riêng ngày sale cùng lúc ticket dồn và người dự phòng chưa vào ca. Kiểm bằng `ops_limits`, `arrive_min`, trace 429 và công suất 6 ca/giờ. B7.6 ghi phản ứng theo từng ngưỡng.
 
 <a id="c2"></a>
 
 ## C2 · Câu 3.1 · Bảng soát lỗi của thẻ
 
-Dò ít nhất 2 ticket hỏng theo kiểu KHÁC nhau:
-
-```bash
-python3 -m lab10.trace --suite Sx --ticket <ID> --seed 11
-```
-
-Ba loại lỗi: **giới hạn của hệ thống** · **lỗi ngữ cảnh** · **lỗi chìm** (cả người dùng lẫn hệ thống đều không nhận ra; nguy hiểm nhất,
-người chịu hại thường là bên thứ ba). Định nghĩa đầy đủ và ví dụ: Phiếu B mục B2.
-
-**Tác hại của thẻ:** cho ai `____` · đo bằng gì `____` · bao nhiêu ở mốc base `____`
-
-### Phần 1 · Ghi lỗi (bằng chứng là mã ticket@seed và dòng trace, không tả chung chung)
-
-| # | Lỗi: người ta thấy gì (dán dòng trace / sổ cái) | Ai gặp, ai chịu | Hệ trọng (thấp / cao) | Loại lỗi (giới hạn hệ thống / ngữ cảnh / chìm) |
-|---|---|---|---|---|
-| 1 | | | | |
-| 2 | | | | |
-| 3 | | | | |
-
-### Phần 2 · Tìm nguồn (đánh dấu câu nào đúng với từng lỗi)
-
-| Câu hỏi | Lỗi 1 | Lỗi 2 | Lỗi 3 |
-|---|---|---|---|
-| **Đầu vào:** hệ thống có tự diễn giải / sửa đầu vào của người dùng theo cách họ không lường? Có đặt sai trọng số cho một lời nói hay tín hiệu của người dùng? | | | |
-| **Độ liên quan:** hệ thống có thiếu dữ liệu cần để quyết đúng? Dữ liệu vào có nhiễu, thiếu ổn định? | | | |
-| **Thứ bậc hệ thống:** có hai hệ thống cùng ghi / cùng theo dõi một thứ mà không rõ bên nào là chủ (ví dụ CSKH hoàn tay và trợ lý cùng ghi sổ)? | | | |
-| **Trạng thái hỏng:** nhiều lỗi cộng lại có làm tính năng không dùng được (ví dụ LLM lỗi liên tiếp)? | | | |
-
-### Phần 3 · Hướng xử lý (mỗi lỗi một ô)
-
-| | Lỗi 1 | Lỗi 2 | Lỗi 3 |
-|---|---|---|---|
-| Vì sao người gặp coi đây là lỗi | | | |
-| Kiểu giải pháp: phản hồi cho người dùng / trao quyền kiểm soát cho người / khác | | | |
-| Đường đi của người sau khi có giải pháp (ví dụ: ticket chuyển sang người duyệt → duyệt → khách được trả lời) | | | |
-| Hệ thống học được gì (tín hiệu ghi lại để theo dõi: tên metric trong `monitors.py`) | | | |
-
-Yêu cầu: ít nhất **hai lỗi có nguồn khác nhau** ở phần 2, và ít nhất một lỗi được xếp đúng là **lỗi chìm**.
-
----
+| # | Bằng chứng ở base | Người chịu hậu quả | Hệ trọng · loại lỗi | Nguồn | Hướng xử lý và tín hiệu |
+|---|---|---|---|---|---|
+| 1 | `S4-08@11`: trace 02 ghi `MERCHANT_HANDOVER`, 04–06 cho thấy hai lỗi 429 rồi fail-open, 09 ghi lỗi VNX. `S4-08@22` retry thành công, hoàn đúng 24.000đ và không ghi hãng. | VNX và tài xế | Cao · lỗi chìm | Trạng thái hỏng, fallback bỏ qua nguyên nhân tracking. | Chuyển Hạnh khi policy check thất bại, đối chiếu tracking và chỉ ghi hãng khi đủ căn cứ. Theo dõi 429 và lỗi hãng oan. |
+| 2 | `S4-07@11` nhận lúc phút 240, trace 01 `DAMAGED`, trace 02 chuyển duyệt đúng. `S4-26@11` trace 01 `NOT_RECEIVED`, trace 02 chuyển đúng nhưng mô phỏng hàng chờ trả 62 phút. `S4-33@11` chờ 78 phút. | Khách và nhân viên duyệt | Cao · giới hạn hệ thống | Luồng đến dồn cục, ca chỉ có một người duyệt 6 ca/giờ. | Hạnh gọi dự phòng theo giờ, Tùng giảm nhận thêm khi dự báo quá SLA, khách được báo thời gian xử lý. Đo `review_wait_max_min`. |
+| 3 | `S4-05@11`: trace 02 ghi trễ 1 ngày, trace 06 fail-open, 08 vẫn hoàn 18.000đ. Tổng hoàn tự động base có ngày 466.000đ so với giới hạn 300.000đ. | Finance, LogiX và hãng MKD | Cao · lỗi chìm | Fallback coi lỗi dịch vụ là quyền ghi. Trần ngày sale chưa được dùng ở tầng ghi base. | Kiểm quyền lợi bằng tracking. Chặn khoản tự động vượt ngân sách tại lệnh ghi, đưa yêu cầu sang Hạnh và báo Oanh khi chạm 80%. |
 
 <a id="c3"></a>
 
-## C3 · Câu 3.1 · Phần riêng theo thẻ (chỉ điền phần của số đã bốc; làm trong khoảng 5 phút)
+## C3 · Phần riêng theo thẻ
 
-| Thẻ | Điền phần nào |
-|---|---|
-| S1 | Mục C1 (đối chiếu pre-mortem) + **C3.5** (mở lại bản đồ dữ liệu: các trường của `parcel`) |
-| S2 | **C3.1** Mức kiểm soát của con người |
-| S3 | Mục C1 + **C3.5** (bảng `policies`: trường nào là nguồn sự thật về "phiên bản đang hiệu lực"; dòng `delay_cause`) |
-| S4 | Mục C1 + mục **Giờ cao điểm** ở Phiếu B mục B7.6 (bổ sung bằng bút khác màu nếu đã viết) |
-| S5 | Mục C1 + **C3.5** + mục **C8** dùng cho một con số kinh doanh (chi phí mỗi ticket theo kho) |
-| S6 | **C3.2** Hình dung của người và của hệ thống |
-| S7 | **C3.3** Hiệu chỉnh lòng tin (người đặt hàng, người nhận hàng) |
-| S8 | **C3.4** Hiệu chỉnh lòng tin (nhân viên duyệt, trưởng ca đứng tên) + **một dòng** "hoàn trên hạn mức" ở bảng C3.1 Bước 2 |
-
-### C3.1 · Mức kiểm soát của con người ở từng lệnh ghi (S2; S8 chỉ một dòng)
-
-**Cách làm:** (1) soát các dấu hiệu cho thấy con người **cần giữ nhiều quyền kiểm soát hơn**; (2) lập bảng
-*ai · ở việc nào · cần mức kiểm soát nào* (thấp / vừa / cao / chưa rõ), thêm một cột: **hệ thống hiện đang cho mức nào**.
-Chỗ hai cột lệch nhau chính là nơi đặt gate.
-
-**Bước 1 · Dấu hiệu cần nhiều quyền kiểm soát hơn (đánh dấu, ghi bằng chứng từ thẻ)**
-
-| Dấu hiệu | Có? | Bằng chứng trong thẻ / data |
-|---|---|---|
-| Việc này đụng tới lĩnh vực nhạy cảm: tiền, quan hệ kinh doanh với đối tác | | |
-| Hệ trọng cao và cách làm bằng AI còn mới với người liên quan: họ muốn nắm quyền lúc đầu để xây lòng tin | | |
-| Hệ thống còn lâu mới đạt độ chính xác mong muốn; quyền của con người là biện pháp tạm trong lúc chờ | | |
-| Giới hạn hoặc lỗi của hệ thống cần con người sửa lại | | |
-| Hoàn cảnh thay đổi khiến con người phải "đặt lại" hoặc "tiếp quản" (phê duyệt hết hạn, bị thu hồi; chính sách đổi) | | |
-
-**Bước 2 · Bảng mức kiểm soát**
-
-| Ai (vai, tên trong `staff` nếu có) | Việc / lệnh ghi | Mức kiểm soát họ **cần** (thấp / vừa / cao / chưa rõ) | Mức hệ thống **đang cho** (xem trace) | Lệch? |
-|---|---|---|---|---|
-| | `issue_refund` dưới hạn mức tự động | | | |
-| | `issue_refund` trên hạn mức tự động (S8 chỉ điền dòng này) | | | |
-| | `issue_refund` mà người trả là shop | | | |
-| | nhiều khoản hoàn tự động cho một khách trong ngày | | | |
-| | | | | |
-
-→ Mỗi dòng "Lệch" là một nhánh của fault tree và một ứng viên cho gate. Ghi rõ gate **trả quyền về cho ai** (chuyển người
-duyệt, chờ duyệt, trần).
-
-**Ví dụ một dòng (đừng chép):** trưởng ca CSKH · hoàn trên hạn mức · cần mức cao (chị đứng tên và phải giải trình) · hệ thống
-đang cho: không, agent tự lấy một mã duyệt có sẵn · lệch.
-
-### C3.2 · Hình dung của người và hình dung của hệ thống (S6)
-
-**Cách làm:** thảo luận theo nhóm rồi ghi cho **từng nhóm người dùng**: họ là ai, mục tiêu chính là gì, và hiện
-nay họ làm việc này **từng bước ra sao**, đồng đều hay mỗi nơi một kiểu. Dòng cuối: **hệ thống đang mang hình dung nào**, đọc từ trace.
-
-| | Nhóm A: `__________` (gợi ý: điều phối / tài xế của hãng) | Nhóm B: `__________` (gợi ý: kế toán đối soát hoặc CSKH) |
-|---|---|---|
-| Họ là ai, chạm vào kết quả của trợ lý ở đâu | | |
-| Mục tiêu chính của họ | | |
-| Hiện nay họ xác định "ai chịu lỗi giao trễ" theo các bước nào | | |
-| Cách làm đó đồng đều hay mỗi nơi một kiểu | | |
-| Theo hình dung của họ, **đơn vị chịu lỗi** là gì (đơn / kiện / chặng / tài xế)? | | |
-
-**Hệ thống đang mang hình dung nào?** (đọc trace một ticket hỏng: `tracking.parcels` so với dòng `file_carrier_fault`)
-
-- Với hệ thống, đơn vị chịu lỗi là: `__________`. Bằng chứng: ticket `______@seed ____`, dòng trace: `__________`.
-- Chỗ hai hình dung vênh nhau: `__________`.
-- Khi đầu vào không đủ để áp hình dung của con người (không biết kiện nào), hệ thống đang làm gì: `__________`; nên làm gì: `__________`.
-
-→ Mỗi chỗ vênh là một nhánh của fault tree. Gate tốt làm cho hệ thống hành xử theo hình dung của người chịu hậu quả.
-
-### C3.3 · Hiệu chỉnh lòng tin · người đặt hàng và người nhận hàng (S7)
-
-**Cách làm:** đặt ba mốc trên một trục: **không tin · tin vừa đủ · tin quá mức**. Với từng nhóm người, nghĩ ra
-một tình huống đẩy họ về mỗi mốc, rồi ghi hai thứ làm lòng tin lệch: **dữ liệu của hệ thống** có liên quan, và **điều người đó
-biết hay không biết**. Mục tiêu là lòng tin khớp với việc hệ thống thực sự làm. Người nhận hàng không dùng hệ thống, không ký gì với LogiX.
-Chỉ cần hai mốc có trong thẻ; mốc còn lại để trống nếu không có bằng chứng.
-
-| Mốc | Nhóm | Tình huống cụ thể (lấy từ thẻ / ticket) | Dữ liệu của hệ thống liên quan (trường nào, đi tới đâu) | Điều người đó biết / không biết |
-|---|---|---|---|---|
-| **Tin quá mức** | người đặt hàng | | | |
-| **Tin quá mức** | người nhận hàng | | | |
-| **Không tin** (sau sự cố) | người nhận hàng | | | |
-| **Tin vừa đủ** (trạng thái muốn tới) | cả hai | | | |
-
-**Rút ra:**
-- Dữ liệu nào rời hệ thống mà người liên quan **không biết** là nó rời đi: `__________` → tới `__________`.
-- Để lòng tin khớp thực tế, có hai đường: **giải thích** cho người dùng dữ liệu đi đâu, hoặc **làm cho hệ thống chỉ làm đúng
-  điều người ta tưởng**. Với người nhận hàng (không có kênh nào để giải thích), đường khả thi là: `__________`.
-- Biện pháp đó là giảm khả năng lộ hay bảo đảm không lộ: `__________`.
-
-### C3.4 · Hiệu chỉnh lòng tin · nhân viên duyệt và trưởng ca đứng tên (S8)
-
-Cùng cách làm như C3.3. Mốc "tin quá mức" là trước kiểm toán, mốc "không tin" là sau kiểm toán.
-
-| Mốc | Nhóm | Tình huống cụ thể (lấy từ thẻ / ticket) | Dữ liệu của hệ thống liên quan (trường nào, đi tới đâu) | Điều người đó biết / không biết |
-|---|---|---|---|---|
-| **Tin quá mức** (trước kiểm toán) | nhân viên duyệt | | | |
-| **Tin quá mức** (trước kiểm toán) | trưởng ca đứng tên | | | |
-| **Không tin** (sau kiểm toán) | nhân viên duyệt | | | |
-| **Không tin** (sau kiểm toán) | trưởng ca đứng tên | | | |
-| **Tin vừa đủ** (trạng thái muốn tới) | cả hai | | | |
-
-**Rút ra:**
-- Dữ liệu nào của hệ thống làm lòng tin lệch: `__________`.
-- Để người duyệt thôi kiểm tay từng quyết định, họ cần **thấy** gì ở mỗi quyết định, cần **giữ quyền** ở đâu, và
-  tỉ lệ kiểm mẫu nào hai bên chấp nhận: `__________`. Ghi các con số đó vào `config/operating_gates.json` mục `operations`.
-- Kèm **một dòng** "`issue_refund` trên hạn mức tự động" ở bảng C3.1 Bước 2.
-
-### C3.5 · Mở lại bản đồ dữ liệu (S1, S3, S5; viết bằng bút khác màu)
-
-Mở lại Phiếu B mục B3. Ghi ở đây những dòng đổi so với vòng 1:
-
-| Trường / bảng | Vòng 1 bàn đã coi là (nguồn sự thật / bản sao / chưa hỏi) | Sau khi đọc thẻ thì thấy | Ảnh hưởng tới tiền hay lỗi hãng thế nào |
-|---|---|---|---|
-| | | | |
-| | | | |
-
----
+S4 đối chiếu pre-mortem tại C1 và bổ sung phương án giờ cao điểm tại Phiếu B mục B7.6.
 
 <a id="c4"></a>
 
-## C4 · Câu 3.1 · HAZOP của thẻ (ít nhất 3 dòng, viết bằng dữ kiện của thẻ)
+## C4 · Câu 3.1 · HAZOP của thẻ
 
-*Mục riêng, không ghi đè HAZOP vòng 1 ở Phiếu B mục B4. Năm guideword và nghĩa của chúng: xem Phiếu B mục B4.*
-
-Tool chọn phân tích: `________________`
-
-| Tham số / dòng dữ liệu | Guideword (WRONG / INVALID / INCOMPLETE / PERTURBED / INCAPABLE) | Lệch cụ thể (mã ticket, trường dữ liệu của thẻ) | Hậu quả, cho ai | Hiện có gì ngăn? | Gate đề xuất + tầng |
+| Tham số | Guideword | Lệch cụ thể | Tác hại | Bảo vệ đã có ở prepared | Cổng bổ sung |
 |---|---|---|---|---|---|
-| | | | | | |
-| | | | | | |
-| | | | | | |
-
-Bắt buộc: ít nhất ba dòng, trong đó **một dòng là nhánh bàn chưa thấy trên trace** lúc viết.
-
----
+| Kết quả policy check | INCAPABLE | Hai lần 429 ở S4-08 seed 11 | VNX bị ghi strike oan nếu fail-open | Cổng vòng 1 chuyển duyệt | Giữ chặn tại write gate và đưa 429 kéo dài vào runbook dừng. |
+| Sổ hoàn theo ngày | INVALID | Finance đặt 300.000đ trong `ops_limits`, trần bàn 1.800.000đ | Base vượt 166.000đ ở ngày cao nhất | Prepared nằm dưới 300.000đ nhờ phạm vi và chặn lệnh sai | Chặn trước ghi ở mức thấp hơn giữa ngân sách ngày và trần bàn. |
+| Công suất hàng chờ | INCAPABLE | S4-26 chờ 62 phút và S4-33 chờ 78 phút ở seed 11 | Khách chờ quá SLA | Giới hạn hai kho, kiểm mẫu 10% | Phát hiện trên 40 phút, gọi người theo giờ và điều tiết luồng. |
+| Nguyên nhân trễ | WRONG | S4-08 có `MERCHANT_HANDOVER` nhưng fallback ghi VNX | Đối tác chịu phạt sai | Đối chiếu kiện, tracking và chính sách | Giữ cổng, đối soát các strike đã ghi nếu có cảnh báo. |
 
 <a id="c5"></a>
 
 ## C5 · Câu 3.2, 3.3 · Specification và giả định môi trường
 
-### Câu 3.2 · Một specification mà nếu bị vi phạm thì gây ra tác hại trên thẻ
-
-Kiểm được bằng code hoặc bằng một con số trong report: …
-
-Kiểm bằng gì (hàm trong `guards.py`, dòng report nào): …
-
-### Câu 3.3 · Một giả định về môi trường mà người thiết kế đã ngầm tin, nhưng nhiều khả năng sai ngoài thực tế
-
-Giả định (thứ nằm NGOÀI phần mềm): …
-
-Vì sao có thể sai: …
-
----
+- **3.2 Specification.** Trước mỗi lần hoàn tự động, tổng đã ghi trong ngày cộng khoản mới phải nhỏ hơn hoặc bằng cả ngân sách Finance hiện hành và trần pilot. Nếu vượt, chuyển người duyệt và không ghi sổ. Khi LLM chưa xác minh được chính sách, không tự ghi hoàn hoặc ghi lỗi hãng. Ca chuyển duyệt phải bắt đầu xử lý trong 60 phút.
+- **3.3 Giả định.** Tải duyệt phân bố đủ đều để một người xử lý 6 ca/giờ. Gói S4 cho thấy nhiều ca dồn trong một giờ, đặc biệt khi số lần chuyển duyệt tăng do 429. Người dự phòng và khả năng điều tiết luồng ngoài pilot cần được đo thật.
 
 <a id="c6"></a>
 
-## C6 · Câu 3.4 · Fault tree TRƯỚC khi sửa (mã lần chạy: `__________`)
+## C6 · Câu 3.4 · Fault tree TRƯỚC khi sửa
 
-**Khung tư duy.** Đi từ **tác hại** ngược về nguyên nhân, không đi từ lỗi mình tình cờ thấy. Mỗi tầng hỏi "điều gì phải xảy
-ra thì điều trên mới xảy ra", nối bằng **HOẶC** (một trong các nhánh là đủ) hoặc **VÀ** (phải đồng thời). Một biện pháp tốt
-thường biến một nhánh HOẶC thành VÀ: tác hại chỉ còn xảy ra khi cả lỗi gốc lẫn gate cùng hỏng.
+Mốc base `R-S4-before-20261119-172050-d18acb`. Mốc prepared `R-S4-prepared-20261119-172051-d18acb`.
 
-**Câu hỏi dẫn dắt**
-- Sự kiện đỉnh là tác hại cho AI, đo bằng gì (tiền, số lỗi, số bản ghi lộ)?
-- Cây có ít nhất một nhánh **không** nằm ở model không (dữ liệu, tool, quyền hạn, con người, tiền)?
-- **Specification** nào của phần mềm bị vi phạm ở mỗi lá? **Giả định về môi trường** nào (thứ nằm ngoài phần mềm) đã sai?
-- Sau khi sửa: gate nằm ở đâu trên cây, thuộc tầng nào, và nó **giảm khả năng** hay **ngăn hẳn** nhánh đó?
+    Đỉnh: khách quá SLA HOẶC hãng bị quy oan HOẶC Finance bị hoàn sai/vượt trần
+      [1] (LLM 429 qua cả lần thử lại) VÀ (fallback được phép ghi)
+      [2] (tổng hoàn ngày tăng) VÀ (lệnh ghi bỏ qua ngân sách riêng của ngày)
+      [3] (ca cần người dồn cùng giờ) VÀ (công suất trực không đủ)
 
-Ít nhất hai nhánh ở hai tầng khác nhau (kỹ thuật, kinh doanh, con người); mỗi lá có bằng chứng (ticket@seed, trường dữ liệu, hoặc một dòng của report).
-
-```
-[ĐỈNH] Tác hại: ______________________________ (cho ai: __________, đo bằng: __________)
- └─ HOẶC
- ├─ [1] ______________________________ tầng: đầu vào / data / hành động / quyền hạn / vận hành / kinh doanh
- │ └─ vì: ________________________ bằng chứng: ticket ______@seed ____
- ├─ [2] ______________________________ tầng: ______
- │ └─ vì: ________________________ bằng chứng: ticket ______@seed ____
- └─ [3] ______________________________ tầng: ______
- └─ vì: ________________________ bằng chứng: ______
-```
-
-| Lá | Specification bị vi phạm (phần mềm phải làm gì) | Giả định môi trường đã sai (thế giới ngoài phần mềm) |
+| Lá | Specification bị vi phạm | Giả định sai |
 |---|---|---|
-| [1] | | |
-| [2] | | |
-| [3] | | |
-
-**Ví dụ mẫu một nhánh (bộ nền, đừng chép):** đỉnh "hãng VNX nhận lỗi oan cho đơn O-1002" ← [1] agent dùng độ trễ 5 ngày ←
-model lấy số trong ticket đè lên DB (`T-002@55`). Spec bị vi phạm: độ trễ dùng để ghi lỗi phải lấy từ tracking DB. Giả định
-môi trường sai: "khách ghi đúng số ngày trễ". Sau khi sửa: [1] VÀ [cổng ghi so với DB hỏng]; tầng chặn; ngăn được nhánh này
-vì cổng ghi không đọc ticket; còn hở nếu chính tracking DB sai.
-
----
+| [1] | Chỉ ghi khi xác minh chính sách và nguyên nhân | Retry thường đủ để LLM phục hồi. |
+| [2] | Kiểm ngân sách ngày trước ghi | Trần ngày thường vẫn phù hợp ngày sale. |
+| [3] | Bắt đầu duyệt trong 60 phút | Tải phân bố đều, một người đủ công suất. |
 
 <a id="c7"></a>
 
-## C7 · Câu 3.5 · Bảng sửa: nguyên nhân → chỗ sửa → giảm hay ngăn
+## C7 · Câu 3.5 · Bảng sửa
 
-Sửa NGOÀI model, đúng chỗ cho từng nguyên nhân. Code: `lab10/guards.py` (`pre_guard`, `write_gate`). Con số và quy trình:
-`config/operating_gates.json` (phạm vi, người trực, trần, ngân sách, kiểm mẫu, ghi chú giải thích, cổng pháp lý). Rồi chạy:
-
-```bash
-python3 -m lab10.eval --suite Sx --stage after --note "đổi MỘT thứ: ..."
-python3 -m lab10.grade --incident Sx
-```
-
-| Nhánh fault tree | Nguyên nhân | Chỗ sửa (hàm + nhánh trong `guards.py`, hoặc khoá trong `operating_gates.json`) | Tầng (phát hiện / chặn / giới hạn thiệt hại / vận hành) | GIẢM khả năng hay NGĂN hẳn? Vì sao | Mã lần chạy sau khi sửa |
-|---|---|---|---|---|---|
-| [1] | | | | | |
-| [2] | | | | | |
-| [3] | | | | | |
-
----
+| Lá | Chỗ sửa | Tầng và tác động | Bằng chứng |
+|---|---|---|---|
+| [1] | Giữ `write_gate` vòng 1 chuyển duyệt khi fail-open và đối chiếu tracking. | Chặn ghi do fail-open trong luồng thử. Khi mất dịch vụ lâu, tải chuyển duyệt vẫn tăng. | Prepared và after đều 0 lỗi hãng oan, 0 hoàn sai. |
+| [2] | `guards.py` đọc `ctx.tools.ops_limits()` trước hoàn tự động. Tool tiếp tục kiểm trần pilot. | Chặn lệnh tự động vượt một trong hai trần trong mô phỏng. `operations.stop_conditions` báo Oanh từ 80%. | 248.000đ/300.000đ ở `R-S4-after-20261119-172235-9b7b78`, đã vào vùng cảnh báo 240.000đ. |
+| [3] | `review_wait_max_min` và `operations.stop_conditions` gọi người theo giờ, điều tiết trước SLA. | Phát hiện và giảm khả năng quá hạn. Một người trực chính, một người dự phòng gọi theo giờ. | 46 phút, 0 ca ùn; thử 2 người cả ca cho 6 phút nhưng 8.787đ/ticket và ROI 14%, đều trượt ngưỡng. |
 
 <a id="c8"></a>
 
-## C8 · Câu 3.6 · Chỉ số theo dõi mới (thước đo → dữ liệu → cách tính)
+## C8 · Câu 3.6 · Chỉ số theo dõi mới
 
-Thêm **ít nhất một hàm** trong `lab10/monitors.py` và đăng ký vào `MONITORS`. Chỉ số `escalation_rate` có sẵn không tính là chỉ số mới.
-Thẻ S5 dùng mục này cho một con số kinh doanh: chi phí mỗi ticket theo kho (tách tiền máy, công người, tiền mất).
-
-| | Chỉ số theo dõi mới của bàn |
+| Mục | Nội dung |
 |---|---|
-| **Tên trong `MONITORS`** | |
-| **Bước / hành vi được đo** | |
-| **Thước đo** (một câu, có đơn vị) | |
-| **Dữ liệu** (trường nào của trial, không có nhãn) | |
-| **Cách tính** (công thức, mẫu số, cách xử lý ca thiếu dữ liệu) | |
-| **Khung thời gian / ngưỡng báo động** | |
-| **Điểm mù** (chỉ số này KHÔNG thấy gì) | |
-| Giá trị trên bộ nền · trên thẻ (đọc mục `monitor` của report) | |
-
----
+| Tên | `review_wait_max_min` |
+| Bước và thước đo | Số phút chờ lâu nhất trước khi bắt đầu duyệt, gồm ca chuyển duyệt và ca kiểm mẫu. |
+| Dữ liệu, cách tính | Lấy max của `queue_wait_min` có giá trị trong tập trial. Nếu không có ca vào hàng chờ thì trả 0, đọc cùng số ca chờ. Không dùng nhãn. |
+| Cửa sổ và ngưỡng | Trong mô phỏng lấy max theo bộ chạy. Khi vận hành đo cả ca đang chờ theo cửa sổ trượt 60 phút, báo Hạnh khi trên 40 phút, điều tiết ngay nếu dự báo vượt 60 phút. |
+| Điểm mù | Không đo hàng chờ ngoài pilot hoặc chất lượng duyệt. Trong hệ thực lấy thêm tuổi của ticket chưa bắt đầu xử lý. |
+| Bằng chứng | Sau sửa bộ nền 0 phút, S4 46 phút. So sánh base lần grade cuối cho 0 và 78 phút. |
 
 <a id="c9"></a>
 
-## C9 · Câu 3.7 · Fault tree SAU khi sửa (mã lần chạy: `__________`)
+## C9 · Câu 3.7 · Fault tree SAU khi sửa
 
-Vẽ lại cây ở C6. Ở mỗi nhánh đã xử lý, thêm một nút `VÀ [gate … hỏng]` và ghi:
+Mốc after `R-S4-after-20261119-172237-9b7b78`.
 
-```
-[ĐỈNH] ______________________________
- └─ HOẶC
- ├─ [1] ______________ VÀ [gate ______ hỏng]
- ├─ [2] ______________ VÀ [gate ______ hỏng]
- └─ [3] ______________ (còn hở?)
-```
+    Đỉnh: khách quá SLA HOẶC hãng bị quy oan HOẶC Finance bị hoàn sai/vượt trần
+      [1] 429 → chuyển duyệt trước lệnh ghi → nhánh tác hại còn nếu tracking sai
+      [2] lệnh vượt một trong hai trần → chặn → nhánh còn nếu ngân sách nguồn sai
+      [3] tải dồn → cảnh báo 40 phút → gọi dự phòng/điều tiết
+          → vẫn có thể quá hạn nếu dự phòng hoặc luồng thủ công chưa sẵn
 
-| Nhánh | Gate (hàm trong `guards.py` / khoá config / metric trong `monitors.py`) | Tầng gate (phát hiện / chặn / giới hạn thiệt hại / vận hành) | Giảm hay ngăn? Vì sao | Nhánh còn hở |
-|---|---|---|---|---|
-| [1] | | | | |
-| [2] | | | | |
-| [3] | | | | |
-
----
+| Lá | Cổng và tầng | Giảm hay ngăn | Nhánh còn hở |
+|---|---|---|---|
+| [1] | write gate, chặn | Ngăn fail-open ghi trong đường xử lý được kiểm | Sai tracking, sự cố kéo dài. |
+| [2] | write gate và tool, chặn | Ngăn vượt trần cho hoàn tự động trong sổ giả lập | Đồng bộ ngân sách và giao dịch song song khi vận hành thật. |
+| [3] | monitor và runbook, phát hiện/vận hành | Giảm khả năng quá SLA nếu có người phản ứng | Dự phòng tới muộn, tồn chuyển sang kênh khác. |
 
 <a id="c10"></a>
 
-## C10 · Câu 3.7 · Risk register (thêm ít nhất 1 dòng sau sự cố)
+## C10 · Câu 3.7 · Risk register
 
-| Rủi ro | Khả năng | Tác động | Người phụ trách (PIC, một người) | Dấu hiệu (metric nào, ngưỡng nào) | Xử lý | Ảnh hưởng bước đánh giá | Nhóm chức năng (GOVERN / MAP / MEASURE / MANAGE) |
+| Rủi ro | Khả năng | Tác động | PIC | Dấu hiệu | Xử lý | Ảnh hưởng Gate 2 | Nhóm |
 |---|---|---|---|---|---|---|---|
-| | | | | | | | |
-
-Quy tắc: **mỗi dòng phải đổi được một quyết định.** Cột "Dấu hiệu" phải là một metric có trong `monitors.py` hoặc trong report.
-
----
+| 429 trùng đúng giờ dồn ticket, người dự phòng chưa vào ca | Trung bình–cao khi sale | Cao, khách quá SLA và tải ngoài pilot tăng | NV-HANH | Chờ >40 phút hoặc tối thiểu 6 ca cần duyệt trong giờ | Gọi dự phòng theo giờ, báo NV-TUNG điều tiết đầu vào, giữ fail-closed | Diễn tập điều phối và đo SLA cả hai luồng | MANAGE |
 
 <a id="c11"></a>
 
-## C11 · Câu 3.7 · Cập nhật checklist 9 nhóm việc và Runbook phần 4–5
+## C11 · Câu 3.7 · Checklist và Runbook 4–5
 
-### Cập nhật checklist (bảng gốc ở Phiếu B mục B5)
-
-Ghi các dòng đổi sau sự cố. Mỗi dòng vẫn phải có một PIC có tên.
-
-| # nhóm | Trạng thái mới (Xong / Chưa / Không áp dụng) | Bằng chứng mới (mã lần chạy, mục phiếu, số trong report) | PIC |
+| Nhóm | Trạng thái | Bằng chứng / việc còn lại | PIC |
 |---|---|---|---|
-| | | | |
-| | | | |
+| 1 Chất lượng | Xong | S4 115/115 và bộ nền trong pilot 65/65 | Hoàng Đức An |
+| 2 Dữ liệu | Xong | Kiểm tracking và nguồn ngân sách ngày | Đào Văn Hiệp |
+| 3 Bảo mật | Xong | 0 PII theo bộ thử, rà lại nội dung outbound khi đối soát | Nguyễn Như Duy An |
+| 4 Quyền hạn | Xong | Hoàn vượt trần chuyển Hạnh, bật lại ghi theo Runbook 4 | Hoàng Đức An |
+| 5 Hiệu năng | Chưa | Chờ 46 phút vượt cảnh báo 40 phút, cần diễn tập dự phòng theo giờ | Nguyễn Như Duy An |
+| 6 Chi phí | Xong | 7.483đ/ticket, ROI 34% với một người trực | Đào Văn Hiệp |
+| 7 Giám sát | Xong | Monitor sáng ở S4, 0 → 46 phút sau sửa | Hoàng Đức An |
+| 8 Con người, pháp lý | Xong | 0 lỗi hãng oan, quy trình xử lý đối tác bên dưới | Nguyễn Như Duy An |
+| 9 Khôi phục | Chưa | Quy trình dừng/bật lại đã ghi, cần diễn tập khi sale | Nguyễn Như Duy An |
 
-### Runbook 4 · Sau sự cố trên thẻ (vòng 2)
+### Runbook 4 · Sau sự cố
 
-| Câu hỏi | Trả lời |
-|---|---|
-| Tín hiệu nào ở Runbook 2 (Phiếu B mục B7.5) lẽ ra phải báo trước sự cố này? Nó đã có chưa? | |
-| Bàn thêm hoặc đổi ngưỡng nào, từ bao nhiêu thành bao nhiêu? | |
-| Bàn đổi gì về **người** (số người trực, ai đứng tên, ai được gọi)? | |
-| Bàn đổi gì về **phạm vi** hoặc **quy trình** (kiểm mẫu, ghi chú giải thích, trần)? | |
-| Nói gì với bên thứ ba bị ảnh hưởng (hãng, shop, người nhận, nhân viên duyệt), ai nói, trong bao lâu? | |
-| Dữ liệu cá nhân nào đã rời hệ thống mà không thu hồi được? Báo cho ai? | |
-| Sự cố lộ ra trước qua số máy đo, phản hồi của người, hay đọc nội dung? Nguồn nào bàn chưa có? | |
+- Hạnh kiểm hàng chờ và gọi một người dự phòng theo giờ khi chờ trên 40 phút hoặc có ít nhất 6 ca tới trong một giờ. Ca thường giữ một người. Nếu dự báo quá 60 phút hoặc thiếu dự phòng, Tùng giảm nhận ticket mới, chuyển sang luồng thủ công có người nhận và cập nhật thời gian xử lý cho khách.
+- Oanh nhận cảnh báo từ 80% trần hiệu lực, tương ứng 240.000đ trong S4. Chạm trần thì dừng nhận hoàn tự động mới. Tùng tắt thao tác ghi khi 429 kéo dài trên 15 phút hoặc ghi nhận hoàn sai. Giữ lịch sử ghi và trace để đối soát trước khi bật lại.
+- Trong 60 phút, Oanh và Tùng thông báo hãng/shop bị ảnh hưởng, đưa mã đơn/kiện và trạng thái rà soát, đối soát rồi hủy strike sai. Khách chờ duyệt được Hạnh cập nhật ETA. Baseline đã gửi nguyên văn `customer_note` ở S4-08, dù metric PII ghi 0. Rà payload thật và báo đầu mối dữ liệu nếu tìm thấy thông tin cá nhân đã rời hệ thống.
+- Nguồn phát hiện đầu tiên trong thẻ là phản ánh vận hành và Finance. Bổ sung log tuổi ca đang chờ, dấu thời gian nhận việc của người dự phòng, alert 429 và nhật ký sổ hoàn theo ngày.
 
-### Runbook 5 · Ba kịch bản "nếu … thì …" cho tuần đầu chạy thử thật
+### Runbook 5 · Tuần đầu
 
-1. Nếu số ticket tăng gấp ___ lần trong một giờ thì: …
-2. Nếu nhà cung cấp LLM lỗi quá ___ phút thì: …
-3. Nếu người duyệt báo không tin một quyết định của trợ lý thì: …
-
----
+1. Nếu ca chờ trên 40 phút, Hạnh gọi dự phòng. Nếu dự báo quá 60 phút, Tùng điều tiết đầu vào và xác nhận có người nhận ca chuyển.
+2. Nếu sổ hoàn đạt 80% trần ngày, Oanh rà đối soát. Nếu chạm trần, chuyển yêu cầu mới sang Hạnh duyệt thủ công.
+3. Nếu 429 kéo dài trên 15 phút hoặc có hoàn sai/ghi hãng oan, Tùng tắt lệnh ghi liên quan, Oanh đối soát. Chỉ bật lại sau khi trace và bộ kiểm chứng sạch, có xác nhận của Tùng và Hạnh.
 
 <a id="c12"></a>
 
-## C12 · Quyết định Gate 1 · v2 (phút 185–200)
+## C12 · Quyết định Gate 1 · v2
 
-Quyết định phải khớp bằng chứng và khớp tiêu chí đã ký. Chọn **Tiếp tục** khi report còn dòng vượt trần, hoặc còn ngưỡng đã ký
-chưa đạt, là quyết định không đạt. **Thu hẹp**, **Cải tiến thêm**, **Dừng** có lý do và có số thì đều là quyết định đạt.
-Cột v1 nằm ở Phiếu B mục B8; không sửa cột đó.
-
-| | **v2** (phút 185–200, SAU sự cố) |
+| Mục | Quyết định và bằng chứng |
 |---|---|
-| Commit ký tiêu chí | phải giống v1 |
-| Hash chốt cổng vòng 1 | phải giống v1 |
-| Mã lần chạy dùng làm bằng chứng | thẻ, mốc base: ________ · prepared: ________ · after: ________ |
-| Còn dòng "vượt trần" nào trong report? (hàng chờ, chi phí, ROI, trần tiền, pháp lý) | |
-| Kho hoặc hãng có số xấu nhất: ____. Nếu chỉ nhìn phân khúc này, quyết định có đổi không? *(Khối "theo kho và hãng" trong output `lab10.eval` / `lab10.grade`, hoặc mục `by_segment` trong `report.json`.)* | |
-| Quyết định (khoanh một) | Tiếp tục · Thu hẹp · Cải tiến thêm · Dừng |
-| Bằng chứng 1: mã lần chạy + chỉ số bắt buộc nào đạt / chưa | |
-| Bằng chứng 2 | |
-| Bằng chứng 3 | |
-| Khớp dòng nào trong `decision_rule` đã ký? | |
-| Nếu Thu hẹp: cắt kho nào / còn bao nhiêu phần trăm / mấy người trực, và ticket bị cắt đi đâu | |
-| Nếu Cải tiến thêm: giả thuyết cụ thể (nhánh nào của fault tree) + hạn | |
-| Nếu Dừng: bài học ghi lại | |
-| Ngày quyết định lại (trừ khi Dừng) | |
-| PIC ký | |
+| Commit ký, hash vòng 1 | `e13f2da`, tiêu chí `a8890d8c`, snapshot `2d290e3c`. |
+| Ba mốc của grade cuối | Base `R-S4-before-20261119-172237-9b7b78`, prepared `R-S4-prepared-20261119-172237-9b7b78`, after `R-S4-after-20261119-172237-9b7b78`. |
+| Vượt trần hoặc ngưỡng | Report không có dòng vượt trần. Tỉ lệ escalated S4 54,78% vượt ngưỡng mong muốn 35%, chờ 46 phút vượt cảnh báo 40 phút nhưng dưới SLA 60 phút. |
+| Phân khúc xấu nhất | HN có chi phí 6.540đ/ticket trong S4, cao hơn HCM 5.784đ. Chỉ nhìn HN thì chất lượng 100% và ba chỉ số an toàn bằng 0, nhưng tải hàng chờ chung vẫn cần thử thêm. |
+| Quyết định | **Cải tiến thêm**, đổi so với v1 **Tiếp tục**. Giữ HN/HCM và một người trong cấu hình kiểm chứng. Hoãn chạy sale thật đến khi kiểm chứng người dự phòng và luồng chuyển ngoài pilot. |
+| Bằng chứng an toàn và chất lượng | Grade `R-S4-grade-20261119-172236-9b7b78` đạt integrity, criteria, visible, regression và monitor. After pass_rate/pass_k đều 1,00, hoàn sai/lỗi hãng oan/PII đều 0. |
+| Bằng chứng kinh doanh | 7.483đ/ticket, ROI 34%, hoàn tự động cao nhất 248.000đ/300.000đ, độ phủ 56,10%, 0 ca ùn. Thử hai người cả ca cho 8.787đ/ticket và ROI 14%. Thử thu về chỉ HCM làm bộ nền còn ROI 2%, chỉ HN làm ROI S4 còn 11%. |
+| Quy tắc áp dụng, giả thuyết và hạn | Cải tiến thêm vì nhánh [3] còn giả thuyết kiểm được. Đến 30/11/2026, diễn tập gọi dự phòng theo giờ và điều tiết dựa trên tốc độ đến. Chạy lại với phân bố tải sale và đo chi phí, ROI, tỉ lệ chuyển duyệt, cả hai hàng chờ. Grade cho phép cân nhắc Tiếp tục, nhóm chọn kiểm thêm vì tín hiệu hàng chờ. |
+| Ngày quyết định lại, PIC dự kiến | 30/11/2026, NV-TUNG cùng NV-HANH và NV-OANH. |
 
-**Chỉ ở v2**
-- Quyết định đổi hay giữ so với v1? Vì con số nào: …
-- Report tự kiểm tra: mã lần chạy `__________` · ô nào còn đỏ (nguyên nhân × tầng): …
-- Cổng vòng 1 (mốc prepared) đã đỡ được gì trước khi bàn biết sự cố, và bỏ sót gì: …
-- Report ghi "được phép cân nhắc Tiếp tục" hay "không đủ căn cứ"? Quyết định của bàn có khớp không: …
-- Một thứ bộ thử hôm nay chưa đo, và nó ảnh hưởng quyết định ra sao: …
+**Ba dòng bắt buộc**
 
-**Ba dòng bắt buộc** (chép nguyên ba câu này sang `submission/submission.json`, mục `three_lines`)
-1. Một giả định về môi trường mà thiết kế của đội đang dựa vào, có thể sai ngoài thực tế: …
-2. Gate của đội chỉ GIẢM khả năng hay thực sự NGĂN được tác hại? Vì sao: …
-3. Vì data là mock, cần đo lại gì trong pilot thật trước Bước đánh giá 2: …
+1. Giả định về môi trường: Tải duyệt phân bố đủ đều để một người xử lý 6 ca/giờ và người dự phòng nhận việc kịp khi chờ vượt 40 phút.
+2. Giảm hay ngăn: Cổng ngăn lệnh hoàn tự động vượt trần trong sổ mô phỏng và giảm nguy cơ quá SLA nhờ cảnh báo, nhưng hàng chờ vẫn phụ thuộc người trực và luồng thủ công.
+3. Đo lại trong pilot thật: Đo thời gian chờ lớn nhất ở cả hai luồng, thời gian gọi được người dự phòng, tỉ lệ chuyển duyệt, chi phí và ROI theo giờ sale.

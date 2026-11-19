@@ -80,6 +80,10 @@ def write_gate(ctx, action):
                 for approval in approvals
             ):
                 return Verdict.escalate("Thiếu phê duyệt hợp lệ cho khoản hoàn")
+        else:
+            finance_cap = ctx.tools.ops_limits().get("daily_auto_refund_budget_vnd")
+            if finance_cap is not None and ctx.tools.auto_refund_today_vnd() + amount > finance_cap:
+                return Verdict.escalate("Vượt ngân sách hoàn tự động của Finance cho ngày hiện tại")
         return Verdict.allow()
 
     if not H.carrier_at_fault(policy, parcel, delay):
