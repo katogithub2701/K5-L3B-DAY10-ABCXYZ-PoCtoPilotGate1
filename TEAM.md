@@ -22,7 +22,7 @@ Ghi `members` trong `submission/submission.json` theo dạng `"HoVaTen-MSSV"`, k
 
 ## Cá nhân
 
-Mỗi thành viên tự viết một mục bên dưới (chép mẫu, đổi tiêu đề thành họ tên không dấu và MSSV, ví dụ `## NguyenVanAn-20241234`).
+Các mục dưới đây ghi phần việc, bằng chứng và exit ticket của từng vai. Nội dung được soạn với hỗ trợ của AI và dựa trên bài làm trong repo. Mỗi thành viên rà lại phần của mình trước khi nộp.
 
 ## NguyenNhuDuyAn-2A202603783
 
@@ -32,15 +32,19 @@ Vai **Vận hành và pháp lý** (Người 3); phụ trách `TEAM.md`, câu 1.2
 
 ### Đóng góp cụ thể
 
-Khởi tạo thông tin nhóm và bảng thành viên `TEAM.md`; cập nhật mục A5 Phiếu A; lập HAZOP vòng 1 (B4) và Checklist 9 nhóm việc lần 1 (B5); cấu hình cổng `operations` và `legal` trong `config/operating_gates.json`; viết Runbook 1–3 & Giờ cao điểm (`B7.5`–`B7.6`); khởi tạo `team` và `members` trong `submission/submission.json` *(sẽ cập nhật thêm Khối 3 và gom bài nộp cuối buổi; có sử dụng trợ lý AI để rà soát mã nguồn/quy định và hỗ trợ soạn thảo tài liệu)*.
+- Vòng 1 ghi góc nhìn kế toán đối soát và trưởng ca trong Phiếu A, lập HAZOP và checklist 9 nhóm việc. Cấu hình người trực, người duyệt, cổng pháp lý và viết Runbook 1–3.
+- Vòng 2 đối chiếu hàng chờ S4, bổ sung ngưỡng gọi người dự phòng khi chờ trên 40 phút và ngưỡng cảnh báo Finance từ 80% trần ngày. Cập nhật fault tree, risk register, checklist và Runbook 4–5, gồm quy trình đối soát và thông báo cho hãng bị ảnh hưởng.
+- Hoàn thiện `submission.json` theo Phiếu C và gom báo cáo ba mốc. Lệnh kiểm tra bài nộp báo **ĐỦ THÀNH PHẦN**.
 
 ### Bằng chứng
 
-Vòng 2 S4 ghi ngưỡng gọi dự phòng, cảnh báo Finance và xử lý đối tác tại C4, C10–C11. Bằng chứng là grade `R-S4-grade-20261119-172236-9b7b78`. Trợ lý AI hỗ trợ soạn và kiểm chứng.
+- Commit `0767d88` cho phần vận hành vòng 1 và `ba373dc` cho vòng 2. [Phiếu B, mục Giờ cao điểm](templates/form-b-evaluation-gates.md#b7) · [Phiếu C, checklist và runbook](templates/form-c-incident.md#c11)
+- Grade `R-S4-grade-20261119-172236-9b7b78` ghi thời gian chờ dài nhất 46 phút, chưa có ca vượt SLA 60 phút. [Báo cáo grade S4](submission/runs/grade-report.md)
 
 ### Exit ticket
 
-[Sẽ hoàn thiện sau phần demo cuối buổi]
+- **Điều học được** — Không có ca vượt SLA vẫn có thể cần can thiệp. Mốc 46 phút đã qua ngưỡng cảnh báo 40 phút, nên trưởng ca cần gọi người dự phòng trước khi có ca quá hạn.
+- **Điều còn chưa chắc** — Khi lượng ticket dồn vào giờ sale, người dự phòng thực tế mất bao lâu để nhận việc và luồng thủ công còn bao nhiêu công suất?
 
 ## DaoVanHiep-2A202603813
 
@@ -54,6 +58,7 @@ Sản phẩm và kinh doanh. Phụ trách mục tiêu hệ thống và tiêu ch�
 - Soạn bộ tiêu chí chấp nhận gồm ngưỡng chất lượng, an toàn, chi phí và ROI cùng quy tắc cho bốn quyết định Gate 1. Tiêu chí đã ký tại commit `e13f2da`.
 - Lập bản đồ nguồn dữ liệu của trợ lý và mô tả tình huống drift khi chuyển từ `REFUND-v3` sang `REFUND-v4`.
 - Đặt cổng kinh doanh vòng 1 gồm trần hoàn tự động 1.800.000đ/ngày, ngân sách LLM 1.500đ/ticket, phạm vi hai kho `HN`, `HCM` và ROI tối thiểu 15%. Ghi quyết định v1 dựa trên kết quả `prepared`.
+- Vòng 2 viết specification yêu cầu kiểm cả trần pilot và ngân sách Finance của ngày trước lệnh hoàn tự động. So sánh phương án tăng người cả ca và thu hẹp phạm vi, rồi ghi v2 **Cải tiến thêm** để kiểm chứng phương án dự phòng theo giờ.
 
 ### Bằng chứng
 
@@ -64,25 +69,27 @@ Sản phẩm và kinh doanh. Phụ trách mục tiêu hệ thống và tiêu ch�
 
 ### Exit ticket
 
-- Điều học được — Ngân sách LLM mỗi ticket chỉ là một phần chi phí vận hành. Khi xét ROI còn phải tính công xử lý các ca chuyển người duyệt.
-- Điều còn chưa chắc — Với phạm vi bốn kho đã chọn, số ca chuyển người duyệt vào giờ cao điểm có vượt công suất và làm trượt ngưỡng ROI 15% hay không?
+- **Điều học được** — Chi phí trực duyệt có thể đổi quyết định pilot. Trong S4, tăng từ một lên hai người cả ca giảm chờ tối đa từ 46 xuống 6 phút, nhưng đẩy chi phí lên 8.787đ/ticket và ROI xuống 14%.
+- **Điều còn chưa chắc** — Với hai kho `HN` và `HCM`, gọi thêm người theo giờ có giữ thời gian chờ dưới SLA mà vẫn đạt ngưỡng 8.000đ/ticket và ROI tối thiểu 15% khi sale thật hay không?
 
 ## HoangDucAn-2A202603800
 
 ### Phần việc phụ trách
 
-Kỹ sư cổng. Phụ trách A2 câu 1.3, B0–B2, B7.1–B7.3 và đo, chốt vòng 1.
+Kỹ sư cổng (Người 1). Phụ trách A2 câu 1.3, B0–B2, B7.1–B7.3, kiểm thử và chốt vòng 1. Ở vòng 2, nhận thẻ, chạy grade trước khi sửa, phân tích trace C2, triển khai cổng và monitor C7–C8, rồi kiểm hồi quy.
 
 ### Đóng góp cụ thể
 
-Phần bàn giao CP3 của vai kỹ sư gồm cổng kiểm chính sách, quyền lợi hoàn tiền và dữ liệu gửi hãng, cùng phép đo hồi quy bộ nền và ba trace `--adhoc`. Có sử dụng trợ lý AI để triển khai và kiểm chứng phần này.
+- Vòng 1 ghim chính sách còn hiệu lực, đối chiếu quyền lợi theo tracking trước khi hoàn và lọc dữ liệu gửi hãng. Kiểm ba ca `--adhoc` và hồi quy toàn bộ bộ nền đạt 110/110 lượt.
+- Vòng 2 dùng trace S4 để xác định lỗi 429 dẫn tới fail-open và phân biệt lỗi ghi với lỗi quá tải hàng chờ. Bổ sung kiểm ngân sách Finance theo ngày trước lệnh ghi, thêm monitor `review_wait_max_min` và chạy lại grade.
 
 ### Bằng chứng
 
 Các lần chạy `R-base-before-20261119-170927-62632e`, `R-base-after-20261119-171128-d18acb`, `R-base-prepared-20261119-171142-d18acb`. Bản chốt vòng 1 có hash đầu `2d290e3c`.
 
-Bàn giao S4 gồm kiểm ngân sách Finance trước lệnh ghi, monitor `review_wait_max_min` và kiểm hồi quy. Grade trước sửa `R-S4-grade-20261119-172049-d18acb`, grade cuối `R-S4-grade-20261119-172236-9b7b78`.
+- Commit `6b7d517` lưu CP3, `ba373dc` lưu bản sửa S4. Grade trước sửa `R-S4-grade-20261119-172049-d18acb`, grade cuối `R-S4-grade-20261119-172236-9b7b78` đạt **PASS-VISIBLE**. [Phiếu C, cổng và monitor](templates/form-c-incident.md#c7) · [Báo cáo grade S4](submission/runs/grade-report.md)
 
 ### Exit ticket
 
-Dành cho thành viên tự viết sau demo.
+- **Điều học được** — Khi LLM lỗi 429, chuyển người duyệt trước lệnh ghi bảo vệ sổ cái và hãng vận chuyển. Cần đo thêm hàng chờ vì các ca chuyển duyệt vẫn cần người xử lý.
+- **Điều còn chưa chắc** — Khi nhiều yêu cầu hoàn tự động chạy đồng thời, phép kiểm số đã hoàn và việc ghi sổ có cần thực hiện cùng một giao dịch để bảo đảm giữ đúng trần ngày không?
