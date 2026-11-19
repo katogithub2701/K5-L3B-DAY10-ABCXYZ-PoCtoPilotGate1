@@ -44,12 +44,15 @@ S4 đối chiếu pre-mortem tại C1 và bổ sung phương án giờ cao đi�
 
 ## C4 · Câu 3.1 · HAZOP của thẻ
 
+Tool chọn phân tích: `issue_refund` và `file_carrier_fault` (kèm thành phần vận hành hàng chờ người duyệt trong giờ sale S4).
+
 | Tham số | Guideword | Lệch cụ thể | Tác hại | Bảo vệ đã có ở prepared | Cổng bổ sung |
 |---|---|---|---|---|---|
-| Kết quả policy check | INCAPABLE | Hai lần 429 ở S4-08 seed 11 | VNX bị ghi strike oan nếu fail-open | Cổng vòng 1 chuyển duyệt | Giữ chặn tại write gate và đưa 429 kéo dài vào runbook dừng. |
+| Kết quả policy check | INCAPABLE | Hai lần 429 ở `S4-08@11` | VNX bị ghi strike oan nếu fail-open | Cổng vòng 1 chuyển duyệt | Giữ chặn tại write gate và đưa 429 kéo dài vào runbook dừng. |
 | Sổ hoàn theo ngày | INVALID | Finance đặt 300.000đ trong `ops_limits`, trần bàn 1.800.000đ | Base vượt 166.000đ ở ngày cao nhất | Prepared nằm dưới 300.000đ nhờ phạm vi và chặn lệnh sai | Chặn trước ghi ở mức thấp hơn giữa ngân sách ngày và trần bàn. |
-| Công suất hàng chờ | INCAPABLE | S4-26 chờ 62 phút và S4-33 chờ 78 phút ở seed 11 | Khách chờ quá SLA | Giới hạn hai kho, kiểm mẫu 10% | Phát hiện trên 40 phút, gọi người theo giờ và điều tiết luồng. |
-| Nguyên nhân trễ | WRONG | S4-08 có `MERCHANT_HANDOVER` nhưng fallback ghi VNX | Đối tác chịu phạt sai | Đối chiếu kiện, tracking và chính sách | Giữ cổng, đối soát các strike đã ghi nếu có cảnh báo. |
+| Công suất hàng chờ | INCAPABLE | `S4-26@11` chờ 62 phút và `S4-33@11` chờ 78 phút | Khách chờ quá SLA 60 phút | Giới hạn hai kho, kiểm mẫu 10% | Phát hiện trên 40 phút (`review_wait_max_min`), gọi người theo giờ và điều tiết luồng. |
+| Nguyên nhân trễ | WRONG | `S4-08@11` có `MERCHANT_HANDOVER` nhưng fallback ghi VNX | Đối tác chịu phạt sai | Đối chiếu kiện, tracking và chính sách | Giữ cổng, đối soát các strike đã ghi nếu có cảnh báo. |
+| Đồng bộ ngân sách khi chạy song song *(nhánh chưa thấy trên trace lúc viết)* | PERTURBED | Hai phiên hoàn tự động cùng đọc `auto_refund_today_vnd()` ngay sát mốc 300.000đ rồi cùng ghi trong hệ thống thật | Tổng hoàn ngày vượt trần Finance dù mỗi lệnh riêng lẻ nhỏ hơn hạn mức | Mô phỏng chạy tuần tự nên chưa phát sinh | Khóa giao dịch (atomic ledger check) khi lên production và báo `NV-OANH` từ 80% (240.000đ). |
 
 <a id="c5"></a>
 
@@ -66,14 +69,17 @@ Mốc base `R-S4-before-20261119-172050-d18acb`. Mốc prepared `R-S4-prepared-2
 
     Đỉnh: khách quá SLA HOẶC hãng bị quy oan HOẶC Finance bị hoàn sai/vượt trần
       [1] (LLM 429 qua cả lần thử lại) VÀ (fallback được phép ghi)
+          — bằng chứng: S4-08@11 (trace 04–06 hai lần 429 → fail-open → 09 ghi oan VNX), S4-05@11 (trace 06 fail-open → 08 hoàn sai 18.000đ); base có 27 lỗi hãng oan, 160.000đ hoàn sai
       [2] (tổng hoàn ngày tăng) VÀ (lệnh ghi bỏ qua ngân sách riêng của ngày)
+          — bằng chứng: report base hoàn tự động ngày cao nhất 466.000đ > ngân sách Finance ngày sale 300.000đ (vượt 166.000đ)
       [3] (ca cần người dồn cùng giờ) VÀ (công suất trực không đủ)
+          — bằng chứng: S4-07@11 (tới phút 240), S4-26@11 (chờ 62 phút), S4-33@11 (chờ 78 phút); report base có 4 ca ùn > SLA 60 phút
 
-| Lá | Specification bị vi phạm | Giả định sai |
-|---|---|---|
-| [1] | Chỉ ghi khi xác minh chính sách và nguyên nhân | Retry thường đủ để LLM phục hồi. |
-| [2] | Kiểm ngân sách ngày trước ghi | Trần ngày thường vẫn phù hợp ngày sale. |
-| [3] | Bắt đầu duyệt trong 60 phút | Tải phân bố đều, một người đủ công suất. |
+| Lá | Bằng chứng (ticket@seed / report) | Specification bị vi phạm | Giả định sai |
+|---|---|---|---|
+| [1] | `S4-08@11`, `S4-05@11`; base: `27` lỗi hãng oan, `160.000đ` hoàn sai | Chỉ ghi khi xác minh chính sách và nguyên nhân | Retry thường đủ để LLM phục hồi. |
+| [2] | Report `R-S4-before-20261119-172050-d18acb`: hoàn ngày cao nhất `466.000đ` / trần Finance `300.000đ` | Kiểm ngân sách ngày trước ghi | Trần ngày thường vẫn phù hợp ngày sale. |
+| [3] | `S4-26@11` (62 phút), `S4-33@11` (78 phút); base: `4` ca ùn > 60 phút | Bắt đầu duyệt trong 60 phút | Tải phân bố đều, một người đủ công suất. |
 
 <a id="c7"></a>
 
@@ -122,7 +128,7 @@ Mốc after `R-S4-after-20261119-172237-9b7b78`.
 
 | Rủi ro | Khả năng | Tác động | PIC | Dấu hiệu | Xử lý | Ảnh hưởng Gate 2 | Nhóm |
 |---|---|---|---|---|---|---|---|
-| 429 trùng đúng giờ dồn ticket, người dự phòng chưa vào ca | Trung bình–cao khi sale | Cao, khách quá SLA và tải ngoài pilot tăng | NV-HANH | Chờ >40 phút hoặc tối thiểu 6 ca cần duyệt trong giờ | Gọi dự phòng theo giờ, báo NV-TUNG điều tiết đầu vào, giữ fail-closed | Diễn tập điều phối và đo SLA cả hai luồng | MANAGE |
+| 429 trùng đúng giờ dồn ticket, người dự phòng chưa vào ca | Trung bình–cao khi sale | Cao, khách quá SLA và tải ngoài pilot tăng | NV-HANH | `review_wait_max_min > 40 phút` (hoặc `escalation_rate > 35%` kèm ≥ 6 ca cần duyệt/giờ) | Gọi dự phòng theo giờ, báo NV-TUNG điều tiết đầu vào, giữ fail-closed | Diễn tập điều phối và đo SLA cả hai luồng | MANAGE |
 
 <a id="c11"></a>
 
@@ -136,9 +142,9 @@ Mốc after `R-S4-after-20261119-172237-9b7b78`.
 | 4 Quyền hạn | Xong | Hoàn vượt trần chuyển Hạnh, bật lại ghi theo Runbook 4 | Hoàng Đức An |
 | 5 Hiệu năng | Chưa | Chờ 46 phút vượt cảnh báo 40 phút, cần diễn tập dự phòng theo giờ | Nguyễn Như Duy An |
 | 6 Chi phí | Xong | 7.483đ/ticket, ROI 34% với một người trực | Đào Văn Hiệp |
-| 7 Giám sát | Xong | Monitor sáng ở S4, 0 → 46 phút sau sửa | Hoàng Đức An |
+| 7 Vận hành | Chưa | Monitor `review_wait_max_min` sáng ở S4 (0 → 46 phút), Runbook 4–5 và quy trình dừng/bật lại đã ghi; còn cần diễn tập gọi dự phòng và khôi phục khi sale | Nguyễn Như Duy An |
 | 8 Con người, pháp lý | Xong | 0 lỗi hãng oan, quy trình xử lý đối tác bên dưới | Nguyễn Như Duy An |
-| 9 Khôi phục | Chưa | Quy trình dừng/bật lại đã ghi, cần diễn tập khi sale | Nguyễn Như Duy An |
+| 9 Quyết định | Xong | Tiêu chí đã ký giữ nguyên (`e13f2da`, hash `a8890d8c`), snapshot `2d290e3c`, quyết định v2 **Cải tiến thêm** kèm giả thuyết và hạn `30/11/2026` ở C12 | Đào Văn Hiệp |
 
 ### Runbook 4 · Sau sự cố
 
