@@ -27,16 +27,69 @@ ctx.gates    config cổng của bàn (config/operating_gates.json), chỉ đọ
 ctx.events   trace tới thời điểm này;  ctx.log("ten_su_kien", ...) ghi thêm sự kiện guard vào trace
 lab10.helpers: db_delay_days, ticket_parcel, effective_policy, entitlement_vnd, carrier_at_fault, digits
 
-Mặc định dưới đây cho qua tất cả (= mốc base).
+Cổng vòng 1 kiểm tra chính sách, lệnh hoàn tiền và tác động lên hãng vận chuyển.
 """
-from . import helpers as H  # noqa: F401
+from . import helpers as H
 from .tools import Verdict
 
 
 def pre_guard(ctx):
-    return Verdict.allow()
+    policy = H.effective_policy(ctx.tools.lookup_policies(), ctx.as_of)
+    if policy is None:
+        return Verdict.escalate("Không tìm thấy chính sách có hiệu lực")
+    return Verdict.allow(policy_id=policy["policy_id"])
 
 
 def write_gate(ctx, action):
-    # action = {"tool": "issue_refund", "ticket_id":..., "order_id":..., "amount_vnd":..., "payer":..., ...}
+    tool = action["tool"]
+    if tool == "notify_carrier":
+        fields = {"order_id", "parcel_id", "district", "delay_days"}
+        blocked = set(ctx.gates.get("legal", {}).get("pii_fields_blocked_to_third_party") or [])
+        payload = {key: value for key, value in action["payload"].items() if key in fields - blocked}
+        return Verdict.modify("Chỉ gửi dữ kiện giao hàng cần thiết", payload=payload)
+
+    if tool not in {"issue_refund", "file_carrier_fault"}:
+        return Verdict.allow()
+
+    if any(event["type"] == "llm_fallback" and event.get("mode") == "fail_open" for event in ctx.events):
+        return Verdict.escalate("LLM chưa kiểm tra được chính sách")
+
+    order = ctx.tools.lookup_order(action["order_id"])
+    policy = H.effective_policy(ctx.tools.lookup_policies(), ctx.as_of)
+    parcel = H.ticket_parcel(order, ctx.ticket, ctx.as_of)
+    delay = H.db_delay_days(parcel, ctx.as_of)
+
+    if tool == "issue_refund":
+        entitled = H.entitlement_vnd(policy, order, delay, parcel.get("delay_cause"))
+        amount = action["amount_vnd"]
+        if amount != entitled or action["payer"] != "LOGIX":
+            return Verdict.escalate("Khoản hoàn không khớp tracking và chính sách")
+        previous = ctx.tools.ledger_rows(order_id=order["order_id"])
+        if sum(row["amount_vnd"] for row in previous) + amount > entitled:
+            return Verdict.deny("Khoản hoàn đã được ghi hoặc vượt quyền lợi còn lại")
+        approval_id = action.get("approval_id")
+        if approval_id or amount > policy["auto_limit_vnd"]:
+            approvals = ctx.tools.lookup_approvals(
+                approval_id=approval_id, order_id=order["order_id"], customer_id=order["customer_id"],
+                status="valid",
+            )
+            approver = ctx.gates.get("operations", {}).get("approver_id")
+            if not any(
+                approval["expires_at"] >= ctx.as_of and approval["max_vnd"] >= amount
+                and (not approver or approval["approver_id"] == approver)
+                for approval in approvals
+            ):
+                return Verdict.escalate("Thiếu phê duyệt hợp lệ cho khoản hoàn")
+        return Verdict.allow()
+
+    if not H.carrier_at_fault(policy, parcel, delay):
+        return Verdict.deny("Tracking không đủ căn cứ ghi lỗi hãng")
+    if action["parcel_id"] != parcel["parcel_id"] or action["delay_days"] != delay:
+        return Verdict.modify(
+            "Ghi lỗi theo kiện và độ trễ trong tracking",
+            parcel_id=parcel["parcel_id"],
+            carrier_id=parcel["carrier_id"],
+            driver_id=parcel.get("driver_id"),
+            delay_days=delay,
+        )
     return Verdict.allow()

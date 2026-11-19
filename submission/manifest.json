@@ -1,0 +1,28 @@
+{
+ "collected_at": "2026-11-19T17:13:59",
+ "incident": null,
+ "run_ids": {},
+ "grade_run_id": null,
+ "criteria_hash": "a8890d8cf161d39255bc95287e17b76673ecf36e2141a0e432e18468afe69900",
+ "round1_hash": "2d290e3c30e36012591d64ec4c18de9f5a34b9a357823ce9ca580a709735df0e",
+ "code_hash": "d18acb2dee48691265642b3c04f5e82beefa9c039b646e7c8252e10b89e0ceab",
+ "files": {
+  "code/guards.py": "01419a55cba68a167e13d81e523b4c141cf4157ee1cf2e5467bc74b7eeae87e8",
+  "code/guards_round1.py": "01419a55cba68a167e13d81e523b4c141cf4157ee1cf2e5467bc74b7eeae87e8",
+  "code/monitors.py": "d1bc112a4a6af68833114a1af8309dc542f0c6eec94c98e0e8e9f95128f5704f",
+  "config/acceptance_criteria.json": "a8890d8cf161d39255bc95287e17b76673ecf36e2141a0e432e18468afe69900",
+  "config/acceptance_criteria.lock": "1cdaa3cc58aa3aeb30d08cc4ab4090277b1d295da15b3a446b0ffc5528982bc9",
+  "config/operating_gates.json": "f7694513a86f304c55b6d5e61a69114c212278d6585aa82901642c18f54efee0",
+  "config/operating_gates.round1.json": "f7694513a86f304c55b6d5e61a69114c212278d6585aa82901642c18f54efee0",
+  "config/round1.lock": "c96b678fd66e32ea4ae7fbe1d1817ece69e32aa1ba3a7ff28cbfe39e5c08909f",
+  "config/switches.json": "7f6b75433f65640f6610a7930ecefae27fc8b1891634803815ef48d9c4a0b457",
+  "docs/form-a-criteria.md": "0b815c2e6df07cfa4a2cd1a198803af4329d8a7e2dbb2de60b00a124a39d7dc2",
+  "docs/form-b-evaluation-gates.md": "571e6f92a1e27ba1201a0db3d7cadb5172605a23e4c579356611ed58fb3cd272",
+  "docs/form-c-incident.md": "c4c26494a4be0a99895ed010cf960d50d34e6217d122cd8d0d652889613bf364",
+  "runs/journal.jsonl": "6b7fe9d4902f73de1e5c33480145287dae0cc701a1ccb2e811f8b5d6f491603d",
+  "runs/R-base-after-20261119-171128-d18acb/report.json": "693c194a67556c4fb7417dacbf41e968d517d18da82149c411bd1b7b436b99f8",
+  "runs/R-base-before-20261119-170927-62632e/report.json": "dcfbd3c29945ab88ff543fd134bae46ca02867cf9216bd7c7f8f7fe651bb5bbd",
+  "runs/R-base-prepared-20261119-171142-d18acb/report.json": "afea16f344a13aad4b856759b1830064494846e87e91b347333235ee658b487f",
+  "submission.json": "58bb0b9006cecd500ad9a04a9cff123e01a7f287b0454cb425b7342db1cf2799"
+ }
+}
